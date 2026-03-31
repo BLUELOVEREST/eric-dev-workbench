@@ -27,6 +27,13 @@ test_help_omits_deploy_entrypoint() {
   assert_contains "$output" "--with zsh,mihomo,codex"
 }
 
+test_stdin_help_has_no_bash_source_error() {
+  local output
+  output="$(cat "$ROOT_DIR/install.sh" | bash -s -- --help 2>&1 || true)"
+  [[ "$output" != *"BASH_SOURCE[0]: unbound variable"* ]] || fail "stdin execution should not hit BASH_SOURCE errors"
+  assert_contains "$output" "install.sh install"
+}
+
 test_remote_mode_requires_git() {
   local tmp_home
   tmp_home="$(mktemp -d)"
@@ -108,6 +115,7 @@ test_with_parsing_rejects_unknown_module() {
 
 test_usage_shows_install_entrypoint
 test_help_omits_deploy_entrypoint
+test_stdin_help_has_no_bash_source_error
 test_remote_mode_requires_git
 test_zsh_install_writes_theme_block
 test_codex_install_adds_nvm_bootstrap

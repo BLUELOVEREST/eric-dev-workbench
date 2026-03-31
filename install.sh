@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [[ -n "${BASH_SOURCE[0]:-}" ]]; then
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+else
+  SCRIPT_DIR="$(pwd)"
+fi
 PACKAGE_ROOT="${PACKAGE_ROOT:-$SCRIPT_DIR}"
 REPO_URL="${REPO_URL:-https://github.com/BLUELOVEREST/eric-dev-workbench.git}"
 

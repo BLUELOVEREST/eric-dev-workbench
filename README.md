@@ -63,3 +63,24 @@ The remote bootstrap path clones the repository with `git` into a temporary dire
 - Shell configuration is managed through a single block in `~/.zshrc`.
 - For older Linux environments, the codex install defaults to Node `16.20.2`.
 - `mihomo` config security is not auto-modified; the installer only warns for risky settings.
+
+## Docker Test Image
+
+Build the Ubuntu non-root test image:
+
+```bash
+docker build -t eric-dev-workbench-test -f Dockerfile.test .
+```
+
+Start an interactive shell as the normal `tester` user:
+
+```bash
+docker run --rm -it eric-dev-workbench-test bash
+```
+
+Run the remote installer directly in one shot:
+
+```bash
+docker run --rm -it eric-dev-workbench-test \
+  bash -lc 'curl -fsSL https://raw.githubusercontent.com/BLUELOVEREST/eric-dev-workbench/main/install.sh | bash -s -- install'
+```
