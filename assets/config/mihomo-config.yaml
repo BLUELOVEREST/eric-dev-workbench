@@ -1,0 +1,289 @@
+port: 56666
+socks-port: 58888
+allow-lan: false
+mode: Rule
+log-level: debug
+external-controller: 127.0.0.1:9090
+experimental:
+  ignore-resolve-fail: true
+hosts:
+  mtalk.google.com: 108.177.125.188
+  tracker.hdtime.org: 172.64.111.34
+  hdtime.org: 172.64.111.34
+rule-providers:
+  reject:
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/reject.txt
+    path: ./ruleset/reject.yaml
+    interval: 86400
+  icloud:
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/icloud.txt
+    path: ./ruleset/icloud.yaml
+    interval: 86400
+  apple:
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/apple.txt
+    path: ./ruleset/apple.yaml
+    interval: 86400
+  google:
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/google.txt
+    path: ./ruleset/google.yaml
+    interval: 86400
+  proxy:
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/proxy.txt
+    path: ./ruleset/proxy.yaml
+    interval: 86400
+  direct:
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/direct.txt
+    path: ./ruleset/direct.yaml
+    interval: 86400
+  private:
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/private.txt
+    path: ./ruleset/private.yaml
+    interval: 86400
+  gfw:
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/gfw.txt
+    path: ./ruleset/gfw.yaml
+    interval: 86400
+  greatfire:
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/greatfire.txt
+    path: ./ruleset/greatfire.yaml
+    interval: 86400
+  tld-not-cn:
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/tld-not-cn.txt
+    path: ./ruleset/tld-not-cn.yaml
+    interval: 86400
+  telegramcidr:
+    type: http
+    behavior: ipcidr
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/telegramcidr.txt
+    path: ./ruleset/telegramcidr.yaml
+    interval: 86400
+  cncidr:
+    type: http
+    behavior: ipcidr
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/cncidr.txt
+    path: ./ruleset/cncidr.yaml
+    interval: 86400
+  lancidr:
+    type: http
+    behavior: ipcidr
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/lancidr.txt
+    path: ./ruleset/lancidr.yaml
+    interval: 86400
+  applications:
+    type: http
+    behavior: classical
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/applications.txt
+    path: ./ruleset/applications.yaml
+    interval: 86400
+proxies:
+  - {name: HK, server: hk.blueloverest.site, port: 4011, type: trojan, password: 19941031Zzc}
+  - {name: US, server: us2.blueloverest.site, port: 4007, type: trojan, password: 19941031Zzc}
+  - {name: OTHER, server: us.blueloverest.site, port: 4010, type: trojan, password: 19941031Zzc}
+proxy-groups: ~
+rules:
+  - DOMAIN,huorong-sec.xjsd.com,REJECT
+  - DOMAIN,clash.razord.top,DIRECT
+  - DOMAIN,yacd.haishan.me,DIRECT
+  - DOMAIN-SUFFIX,zhixingheyitx.online,DIRECT
+  - DOMAIN-SUFFIX,miguvideo.com,DIRECT
+  - DOMAIN-SUFFIX,tjupt.org,DIRECT
+  - DOMAIN-SUFFIX,blueloverest.site,DIRECT
+  - DOMAIN-SUFFIX,hassbian.com,DIRECT
+  - DOMAIN-SUFFIX,steamcontent.com,DIRECT
+  - DOMAIN,*.steamcontent.com,DIRECT
+  - DOMAIN,fastly.cdn.steampipe.steamcontent.com,DIRECT
+  - DOMAIN,cdn.fastly.steamstatic.com,DIRECT
+  - DOMAIN,*.fastly.steamstatic.com,DIRECT
+  - DOMAIN-SUFFIX,fastly.steamstatic.com,DIRECT
+  - DOMAIN,steamcdn-a.akamaihd.net,DIRECT
+  - DOMAIN-SUFFIX,cm.steampowered.com,DIRECT
+  - DOMAIN-SUFFIX,steamserver.net,DIRECT
+  - IP-CIDR,45.121.184.0/24,DIRECT
+  - IP-CIDR,103.10.124.0/23,DIRECT
+  - IP-CIDR,103.28.54.0/24,DIRECT
+  - IP-CIDR,146.66.152.0/24,DIRECT
+  - IP-CIDR,146.66.155.0/24,DIRECT
+  - IP-CIDR,153.254.86.0/24,DIRECT
+  - IP-CIDR,155.133.224.0/22,DIRECT
+  - IP-CIDR,155.133.230.0/24,DIRECT
+  - IP-CIDR,155.133.232.0/23,DIRECT
+  - IP-CIDR,155.133.234.0/24,DIRECT
+  - IP-CIDR,155.133.236.0/22,DIRECT
+  - IP-CIDR,155.133.240.0/23,DIRECT
+  - IP-CIDR,155.133.244.0/23,DIRECT
+  - IP-CIDR,155.133.246.0/24,DIRECT
+  - IP-CIDR,155.133.248.0/21,DIRECT
+  - IP-CIDR,162.254.192.0/21,DIRECT
+  - IP-CIDR,185.25.182.0/23,DIRECT
+  - IP-CIDR,190.217.32.0/22,DIRECT
+  - IP-CIDR,192.69.96.0/22,DIRECT
+  - IP-CIDR,205.196.6.0/24,DIRECT
+  - IP-CIDR,208.64.200.0/22,DIRECT
+  - IP-CIDR,208.78.164.0/22,DIRECT
+  - IP-CIDR,205.185.194.0/24,DIRECT
+  - DOMAIN,cdn.usefathom.com,US
+  - DOMAIN,aistudio.google.com,US
+  - DOMAIN,ai.google.dev,US
+  - DOMAIN,ai.dev,US
+  - DOMAIN-SUFFIX,makersuite.google.com,US
+  - DOMAIN,alkalicore-pa.clients6.google.com,US
+  - DOMAIN,alkalimakersuite-pa.clients6.google.com,US
+  - DOMAIN-SUFFIX,generativeai.google,US
+  - DOMAIN,developerprofiles-pa.googleapis.com,US
+  - DOMAIN,content-developerprofiles-pa.googleapis.com,US
+  - DOMAIN,fonts.googleapis.com,US
+  - DOMAIN,www.google-analytics.com,US
+  - DOMAIN,play.google.com,US
+  - DOMAIN,people-pa.clients6.google.com,US
+  - DOMAIN,waa-pa.clients6.google.com,US
+  - DOMAIN-SUFFIX,quark.cn,US
+  - DOMAIN-SUFFIX,hassbian.com,US
+  - DOMAIN-SUFFIX,matrix.org,US
+  - DOMAIN-SUFFIX,chatgpt.com,US
+  - DOMAIN-SUFFIX,auth0.com,US
+  - DOMAIN,gemini.google.com,US
+  - DOMAIN,bard.google.com,US
+  - DOMAIN-SUFFIX,anthropic.com,US
+  - DOMAIN-SUFFIX,perplexity.ai,US
+  - DOMAIN-SUFFIX,claude.ai,US
+  - DOMAIN-SUFFIX,openai.com,US
+  - DOMAIN-SUFFIX,pscdn.co,US
+  - DOMAIN-SUFFIX,scdn.co,US
+  - DOMAIN-SUFFIX,spoti.fi,US
+  - DOMAIN-SUFFIX,spotify.com,US
+  - DOMAIN-SUFFIX,spotifycdn.net,US
+  - DOMAIN-KEYWORD,spotify,US
+  - DOMAIN-KEYWORD,fsm.name,US
+  - DOMAIN-SUFFIX,openai.com,US
+  - DOMAIN-SUFFIX,pay.openai.com,US
+  - DOMAIN-SUFFIX,chat.openai.com,US
+  - DOMAIN-SUFFIX,challenges.cloudflare.com,US
+  - DOMAIN-SUFFIX,auth0.com,US
+  - DOMAIN-SUFFIX,auth0.openai.com,US
+  - DOMAIN-SUFFIX,platform.openai.com,US
+  - DOMAIN-SUFFIX,chatgpt.com,US
+  - DOMAIN-SUFFIX,hcaptcha.com,US
+  - DOMAIN-SUFFIX,recaptcha.net,US
+  - DOMAIN-SUFFIX,sfx.ms,US
+  - DOMAIN-SUFFIX,microsoft.com,US
+  - DOMAIN-SUFFIX,oaistatic.com,US
+  - DOMAIN-SUFFIX,oaiusercontent.com,US
+  - DOMAIN-SUFFIX,ai.com,US
+  - DOMAIN-SUFFIX,invoice.stripe.com,US
+  - DOMAIN-SUFFIX,stripe.com,US
+  - DOMAIN,bard.google.com,US
+  - DOMAIN-SUFFIX,bing.com,US
+  - DOMAIN-SUFFIX,sentry.io,US
+  - DOMAIN-SUFFIX,identrust.com,US
+  - DOMAIN,openaiapi-site.azureedge.net,US
+  - DOMAIN-SUFFIX,poe.com,US
+  - DOMAIN,servd-anthropic-website.b-cdn.net,US
+  - DOMAIN-SUFFIX,anthropic.com,US
+  - DOMAIN-SUFFIX,claude.ai,US
+  - DOMAIN-SUFFIX,printables.com,US
+  - DOMAIN-SUFFIX,0ff.cc,US
+  - DOMAIN-SUFFIX,transfermarkt.com,US
+  - DOMAIN-SUFFIX,anthropic.com,US
+  - DOMAIN-SUFFIX,claude.ai,US
+  - DOMAIN-SUFFIX,btschool.club,DIRECT
+  - DOMAIN-SUFFIX,qualcomm.com,DIRECT
+  - DOMAIN-SUFFIX,notion.so,DIRECT
+  - DOMAIN-SUFFIX,amazonaws.com,DIRECT
+  - DOMAIN-SUFFIX,githubusercontent.com,DIRECT
+  - DOMAIN-SUFFIX,netflix.com,DIRECT
+  - DOMAIN-SUFFIX,netflix.net,DIRECT
+  - DOMAIN-SUFFIX,nflxext.com,DIRECT
+  - DOMAIN-SUFFIX,nflximg.com,DIRECT
+  - DOMAIN-SUFFIX,nflximg.net,DIRECT
+  - DOMAIN-SUFFIX,nflxso.net,DIRECT
+  - DOMAIN-SUFFIX,nflxvideo.net,DIRECT
+  - DOMAIN-SUFFIX,slack.com,DIRECT
+  - DOMAIN,sydney.bing.com,DIRECT
+  - DOMAIN,www.bing.com,DIRECT
+  - DOMAIN-SUFFIX,f-droid.org,DIRECT
+  - DOMAIN-SUFFIX,supes.top,DIRECT
+  - DOMAIN-SUFFIX,btnull.org,DIRECT
+  - DOMAIN-SUFFIX,steamstatic.com,DIRECT
+  - DOMAIN-SUFFIX,docker.com,DIRECT
+  - DOMAIN-SUFFIX,docker.io,DIRECT
+  - DOMAIN-SUFFIX,qnapclub.eu,DIRECT
+  - DOMAIN-SUFFIX,dasai8.cc,DIRECT
+  - DOMAIN-SUFFIX,notion.so,DIRECT
+  - DOMAIN-SUFFIX,notion.site,DIRECT
+  - DOMAIN-SUFFIX,textnow.com,DIRECT
+  - DOMAIN-SUFFIX,armconverter.com,DIRECT
+  - DOMAIN-SUFFIX,macat.vip,DIRECT
+  - DOMAIN-SUFFIX,prodirectsport.com,DIRECT
+  - DOMAIN-SUFFIX,jubt.fun,DIRECT
+  - DOMAIN-SUFFIX,btnull.org,DIRECT
+  - DOMAIN-SUFFIX,tkznp.com,DIRECT
+  - DOMAIN-SUFFIX,nanodm.net,DIRECT
+  - DOMAIN-SUFFIX,mypikpak.com,DIRECT
+  - DOMAIN-SUFFIX,alpinelinux.org,DIRECT
+  - DOMAIN-SUFFIX,msecnd.net,DIRECT
+  - DOMAIN-SUFFIX,iterm2.com,DIRECT
+  - DOMAIN-SUFFIX,msecnd.net,DIRECT
+  - DOMAIN-SUFFIX,vsthemes.org,DIRECT
+  - DOMAIN-SUFFIX,deviantart.com,DIRECT
+  - DOMAIN-SUFFIX,restya.com,DIRECT
+  - DOMAIN-SUFFIX,taiga.io,DIRECT
+  - DOMAIN-SUFFIX,rockstargames.com,DIRECT
+  - DOMAIN-SUFFIX,tiktokv.com,DIRECT
+  - DOMAIN-SUFFIX,tkznp.com,DIRECT
+  - DOMAIN-SUFFIX,w3.org,DIRECT
+  - DOMAIN-SUFFIX,v2ex.com,DIRECT
+  - DOMAIN-SUFFIX,madou.club,DIRECT
+  - DOMAIN-SUFFIX,rousi.zip,DIRECT
+  - DOMAIN-SUFFIX,soulvoice.club,DIRECT
+  - DOMAIN-SUFFIX,icc2022.com,DIRECT
+  - DOMAIN-SUFFIX,hdkyl.in,DIRECT
+  - DOMAIN-SUFFIX,docker.io,DIRECT
+  - DOMAIN-SUFFIX,assrt.net,DIRECT
+  - DOMAIN-SUFFIX,crabpt.vip,DIRECT
+  - DOMAIN-SUFFIX,ptlgs.org,DIRECT
+  - DOMAIN-SUFFIX,kufei.org,DIRECT
+  - DOMAIN-SUFFIX,okpt.net,DIRECT
+  - DOMAIN-SUFFIX,ptchina.org,DIRECT
+  - DOMAIN-SUFFIX,njtupt.top,DIRECT
+  - DOMAIN-SUFFIX,u.tools,DIRECT
+  - DOMAIN-SUFFIX,githubusercontent.com,DIRECT
+  - DOMAIN-SUFFIX,gamegamept.com,DIRECT
+  - DOMAIN-SUFFIX,hassbian.com,DIRECT
+  - DOMAIN-SUFFIX,docker.io,DIRECT
+  - DOMAIN-SUFFIX,ptcafe.club,DIRECT
+  - DOMAIN-SUFFIX,hdfans.org,DIRECT
+  - DOMAIN-SUFFIX,raingfh.top,DIRECT
+  - DOMAIN-SUFFIX,ptzone.xyz,DIRECT
+  - DOMAIN-SUFFIX,wap.ac,DIRECT
+  - DOMAIN-SUFFIX,themoviedb.org,DIRECT
+  - DOMAIN-SUFFIX,pttime.org,OTHER
+  - DOMAIN-SUFFIX,haidan.video,OTHER
+  - DOMAIN-SUFFIX,1ptba.com,OTHER
+  - RULE-SET,applications,DIRECT
+  - RULE-SET,private,DIRECT
+  - RULE-SET,reject,REJECT
+  - RULE-SET,tld-not-cn,DIRECT
+  - RULE-SET,gfw,DIRECT
+  - RULE-SET,greatfire,DIRECT
+  - RULE-SET,telegramcidr,DIRECT
+  - MATCH,DIRECT

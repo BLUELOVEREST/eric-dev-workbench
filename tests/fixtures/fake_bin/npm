@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+set -euo pipefail
+echo "fixture npm: $*" >>"${TEST_LOG:-/tmp/fixture.log}"

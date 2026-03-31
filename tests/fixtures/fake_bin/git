@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+echo "fixture git: $*" >>"${TEST_LOG:-/tmp/fixture.log}"
+
+if [[ "${1:-}" == "clone" ]]; then
+  target="${@: -1}"
+  mkdir -p "$target"
+  if [[ "$target" == *".oh-my-zsh" ]]; then
+    mkdir -p "$target/custom/themes" "$target/custom/plugins"
+    cat >"$target/oh-my-zsh.sh" <<'EOF'
+#!/usr/bin/env bash
+return 0 2>/dev/null || exit 0
+EOF
+    chmod +x "$target/oh-my-zsh.sh"
+  fi
+fi

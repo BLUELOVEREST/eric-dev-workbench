@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+echo "fixture curl: $*" >>"${TEST_LOG:-/tmp/fixture.log}"
+
+cat <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+mkdir -p "$HOME/.nvm"
+cat >"$HOME/.nvm/nvm.sh" <<'INNER'
+nvm() {
+  return 0
+}
+INNER
+EOF

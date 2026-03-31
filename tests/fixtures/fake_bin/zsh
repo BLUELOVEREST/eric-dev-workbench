@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+echo "fixture zsh: $*" >>"${TEST_LOG:-/tmp/fixture.log}"
+
+if [[ "${1:-}" == "--version" ]]; then
+  echo "zsh 5.9"
+fi
