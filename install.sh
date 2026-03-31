@@ -88,6 +88,10 @@ ensure_zsh_block() {
 write_shell_config() {
   local zshrc="$HOME/.zshrc"
   local block
+  local mihomo_http_port
+  local mihomo_socks_port
+  mihomo_http_port="$(get_mihomo_http_port)"
+  mihomo_socks_port="$(get_mihomo_socks_port)"
   block='export ZSH="$HOME/.oh-my-zsh"
 export ZSH_THEME="powerlevel10k/powerlevel10k"
 plugins=(git zsh-autosuggestions zsh-syntax-highlighting z)
@@ -105,9 +109,9 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
 
 proxy_on() {
-  export http_proxy="http://127.0.0.1:7890"
-  export https_proxy="http://127.0.0.1:7890"
-  export all_proxy="socks5://127.0.0.1:7891"
+  export http_proxy="http://127.0.0.1:'"$mihomo_http_port"'"
+  export https_proxy="http://127.0.0.1:'"$mihomo_http_port"'"
+  export all_proxy="socks5://127.0.0.1:'"$mihomo_socks_port"'"
   export HTTP_PROXY="$http_proxy"
   export HTTPS_PROXY="$https_proxy"
   export ALL_PROXY="$all_proxy"
@@ -121,6 +125,30 @@ proxy_off() {
   unset no_proxy NO_PROXY
 }'
   ensure_zsh_block "$zshrc" "$block"
+}
+
+get_mihomo_config_path() {
+  echo "$PACKAGE_ROOT/assets/config/mihomo-config.yaml"
+}
+
+get_mihomo_http_port() {
+  local cfg
+  cfg="$(get_mihomo_config_path)"
+  if [[ -f "$cfg" ]]; then
+    awk -F': *' '/^port:/ {print $2; exit}' "$cfg"
+    return 0
+  fi
+  echo "7890"
+}
+
+get_mihomo_socks_port() {
+  local cfg
+  cfg="$(get_mihomo_config_path)"
+  if [[ -f "$cfg" ]]; then
+    awk -F': *' '/^socks-port:/ {print $2; exit}' "$cfg"
+    return 0
+  fi
+  echo "7891"
 }
 
 get_zsh_version() {

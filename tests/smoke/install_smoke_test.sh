@@ -48,6 +48,8 @@ test_zsh_install_writes_theme_block() {
   content="$(cat "$tmp_home/.zshrc" 2>/dev/null || true)"
   assert_contains "$content" 'export ZSH="$HOME/.oh-my-zsh"'
   assert_contains "$content" 'export ZSH_THEME="powerlevel10k/powerlevel10k"'
+  assert_contains "$content" 'export http_proxy="http://127.0.0.1:56666"'
+  assert_contains "$content" 'export all_proxy="socks5://127.0.0.1:58888"'
   rm -rf "$tmp_home"
 }
 
