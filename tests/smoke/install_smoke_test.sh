@@ -46,6 +46,23 @@ test_remote_mode_requires_git() {
   rm -rf "$tmp_home"
 }
 
+test_remote_bootstrap_has_no_workdir_trap_error() {
+  local tmp_home
+  tmp_home="$(mktemp -d)"
+  cp "$ROOT_DIR/install.sh" "$tmp_home/install.sh"
+  local output
+  output="$(HOME="$tmp_home" PATH="$ROOT_DIR/tests/fixtures/fake_bin:/usr/bin:/bin" FIXTURE_GIT_CLONE_SOURCE="$ROOT_DIR" \
+    /bin/bash "$tmp_home/install.sh" install --with codex 2>&1 || true)"
+  [[ "$output" != *"workdir: unbound variable"* ]] || fail "remote bootstrap should not leak a workdir trap error"
+  rm -rf "$tmp_home"
+}
+
+test_dockerfile_has_ncurses_dev() {
+  local output
+  output="$(grep -n "libncurses-dev" "$ROOT_DIR/Dockerfile.test" 2>&1 || true)"
+  assert_contains "$output" "libncurses-dev"
+}
+
 test_zsh_install_writes_theme_block() {
   local tmp_home
   tmp_home="$(mktemp -d)"
@@ -117,6 +134,8 @@ test_usage_shows_install_entrypoint
 test_help_omits_deploy_entrypoint
 test_stdin_help_has_no_bash_source_error
 test_remote_mode_requires_git
+test_remote_bootstrap_has_no_workdir_trap_error
+test_dockerfile_has_ncurses_dev
 test_zsh_install_writes_theme_block
 test_codex_install_adds_nvm_bootstrap
 test_zsh_block_is_idempotent

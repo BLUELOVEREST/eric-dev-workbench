@@ -5,6 +5,9 @@ echo "fixture git: $*" >>"${TEST_LOG:-/tmp/fixture.log}"
 if [[ "${1:-}" == "clone" ]]; then
   target="${@: -1}"
   mkdir -p "$target"
+  if [[ -n "${FIXTURE_GIT_CLONE_SOURCE:-}" ]]; then
+    cp -R "$FIXTURE_GIT_CLONE_SOURCE"/. "$target"/
+  fi
   if [[ "$target" == *".oh-my-zsh" ]]; then
     mkdir -p "$target/custom/themes" "$target/custom/plugins"
     cat >"$target/oh-my-zsh.sh" <<'EOF'

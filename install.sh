@@ -508,7 +508,7 @@ bootstrap_repo() {
   local workdir
   local args
   workdir="$(mktemp -d)"
-  trap 'rm -rf "$workdir"' EXIT
+  trap "rm -rf '$workdir'" EXIT
 
   git clone --depth=1 "$REPO_URL" "$workdir/repo" >/dev/null 2>&1 || die "failed to clone repository: $REPO_URL"
   args=(install --with "$WITH" --root "$UENV_ROOT")
