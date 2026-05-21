@@ -16,6 +16,9 @@ NODE_VERSION="${NODE_VERSION:-16.20.2}"
 CODEX_NPM_PACKAGE="${CODEX_NPM_PACKAGE:-@openai/codex}"
 NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
 MIN_ZSH_VERSION="${MIN_ZSH_VERSION:-5.8}"
+MIHOMO_PROFILE_URL="${MIHOMO_PROFILE_URL:-https://subconverter.blueloverest.site:44443/getprofile?name=myconfigs/stable/config.ini&token=123456789}"
+MIHOMO_HTTP_PORT="${MIHOMO_HTTP_PORT:-56666}"
+MIHOMO_SOCKS_PORT="${MIHOMO_SOCKS_PORT:-58888}"
 
 log() {
   echo "[eric-dev-workbench] $*"
@@ -131,28 +134,12 @@ proxy_off() {
   ensure_zsh_block "$zshrc" "$block"
 }
 
-get_mihomo_config_path() {
-  echo "$PACKAGE_ROOT/assets/config/mihomo-config.yaml"
-}
-
 get_mihomo_http_port() {
-  local cfg
-  cfg="$(get_mihomo_config_path)"
-  if [[ -f "$cfg" ]]; then
-    awk -F': *' '/^port:/ {print $2; exit}' "$cfg"
-    return 0
-  fi
-  echo "7890"
+  echo "$MIHOMO_HTTP_PORT"
 }
 
 get_mihomo_socks_port() {
-  local cfg
-  cfg="$(get_mihomo_config_path)"
-  if [[ -f "$cfg" ]]; then
-    awk -F': *' '/^socks-port:/ {print $2; exit}' "$cfg"
-    return 0
-  fi
-  echo "7891"
+  echo "$MIHOMO_SOCKS_PORT"
 }
 
 get_zsh_version() {
@@ -177,6 +164,18 @@ fetch_to_file() {
     wget -qO "$out" "$url"
   else
     die "curl or wget is required"
+  fi
+}
+
+fetch_mihomo_profile_to_file() {
+  local url="$1"
+  local out="$2"
+  if command -v wget >/dev/null 2>&1; then
+    wget -qO "$out" "$url"
+  elif command -v curl >/dev/null 2>&1; then
+    curl -fsSL "$url" -o "$out"
+  else
+    die "wget or curl is required"
   fi
 }
 
@@ -380,12 +379,126 @@ warn_mihomo_config_risks() {
   fi
 }
 
+normalize_mihomo_config() {
+  local input="$1"
+  local output="$2"
+  awk -v http_port="$MIHOMO_HTTP_PORT" -v socks_port="$MIHOMO_SOCKS_PORT" '
+    BEGIN { saw_port=0; saw_socks=0 }
+    /^port:[[:space:]]*/ {
+      print "port: " http_port
+      saw_port=1
+      next
+    }
+    /^socks-port:[[:space:]]*/ {
+      print "socks-port: " socks_port
+      saw_socks=1
+      next
+    }
+    { print }
+    END {
+      if (!saw_port) print "port: " http_port
+      if (!saw_socks) print "socks-port: " socks_port
+    }
+  ' "$input" >"$output"
+}
+
+download_mihomo_config() {
+  local target="$1"
+  local raw_tmp
+  local normalized_tmp
+  raw_tmp="$(mktemp)"
+  normalized_tmp="$(mktemp)"
+  fetch_mihomo_profile_to_file "$MIHOMO_PROFILE_URL" "$raw_tmp"
+  normalize_mihomo_config "$raw_tmp" "$normalized_tmp"
+  mkdir -p "$(dirname "$target")"
+  mv "$normalized_tmp" "$target"
+  rm -f "$raw_tmp"
+  chmod 600 "$target"
+}
+
+render_mihomo_update_script() {
+  cat <<EOF
+#!/usr/bin/env bash
+set -euo pipefail
+
+PROFILE_URL="$MIHOMO_PROFILE_URL"
+HTTP_PORT="$MIHOMO_HTTP_PORT"
+SOCKS_PORT="$MIHOMO_SOCKS_PORT"
+RUNTIME_ROOT="\${RUNTIME_ROOT:-$UENV_ROOT}"
+CONFIG_FILE="\${CONFIG_FILE:-\$RUNTIME_ROOT/etc/clash/config.yaml}"
+DAEMON="\$RUNTIME_ROOT/bin/mihomo-daemon.sh"
+
+fetch_to_file() {
+  local url="\$1"
+  local out="\$2"
+  if command -v wget >/dev/null 2>&1; then
+    wget -qO "\$out" "\$url"
+  elif command -v curl >/dev/null 2>&1; then
+    curl -fsSL "\$url" -o "\$out"
+  else
+    echo "wget or curl is required" >&2
+    exit 1
+  fi
+}
+
+normalize_config() {
+  local input="\$1"
+  local output="\$2"
+  awk -v http_port="\$HTTP_PORT" -v socks_port="\$SOCKS_PORT" '
+    BEGIN { saw_port=0; saw_socks=0 }
+    /^port:[[:space:]]*/ { print "port: " http_port; saw_port=1; next }
+    /^socks-port:[[:space:]]*/ { print "socks-port: " socks_port; saw_socks=1; next }
+    { print }
+    END {
+      if (!saw_port) print "port: " http_port
+      if (!saw_socks) print "socks-port: " socks_port
+    }
+  ' "\$input" >"\$output"
+}
+
+raw_tmp="\$(mktemp)"
+normalized_tmp="\$(mktemp)"
+trap 'rm -f "\$raw_tmp" "\$normalized_tmp"' EXIT
+
+fetch_to_file "\$PROFILE_URL" "\$raw_tmp"
+normalize_config "\$raw_tmp" "\$normalized_tmp"
+mkdir -p "\$(dirname "\$CONFIG_FILE")"
+mv "\$normalized_tmp" "\$CONFIG_FILE"
+chmod 600 "\$CONFIG_FILE"
+
+if [[ -x "\$DAEMON" ]] && "\$DAEMON" status >/dev/null 2>&1; then
+  "\$DAEMON" restart >/dev/null 2>&1 || true
+fi
+EOF
+}
+
+write_mihomo_update_script() {
+  local target="$1"
+  render_mihomo_update_script >"$target"
+  chmod 755 "$target"
+}
+
+install_mihomo_config_update_schedule() {
+  local updater="$1"
+  if ! command -v crontab >/dev/null 2>&1; then
+    log "crontab not found; skip automatic mihomo config updates. Run manually: $updater"
+    return 0
+  fi
+
+  local marker="# eric-dev-workbench mihomo config update"
+  local entry="17 */6 * * * $updater >/dev/null 2>&1 $marker"
+  local tmp
+  tmp="$(mktemp)"
+  crontab -l 2>/dev/null | grep -Fv "$marker" >"$tmp" || true
+  printf '%s\n' "$entry" >>"$tmp"
+  crontab "$tmp"
+  rm -f "$tmp"
+}
+
 install_mihomo_env() {
-  local source_bin source_config version install_dir target_bin target_config target_daemon
+  local source_bin version install_dir target_bin target_config target_daemon target_updater
   source_bin="$(resolve_mihomo_asset)"
   [[ -f "$source_bin" ]] || die "missing mihomo asset: $source_bin"
-  source_config="$PACKAGE_ROOT/assets/config/mihomo-config.yaml"
-  [[ -f "$source_config" ]] || die "missing mihomo config: $source_config"
 
   version="$("$source_bin" -v 2>/dev/null | head -n1 | grep -Eo 'v[0-9]+(\.[0-9]+){1,3}([._-][A-Za-z0-9]+)?' | head -n1 || true)"
   version="${version#v}"
@@ -396,13 +509,15 @@ install_mihomo_env() {
   target_bin="$install_dir/bin/mihomo"
   target_config="$UENV_ROOT/etc/clash/config.yaml"
   target_daemon="$UENV_ROOT/bin/mihomo-daemon.sh"
+  target_updater="$UENV_ROOT/bin/mihomo-update-config.sh"
 
   mkdir -p "$install_dir/bin" "$(dirname "$target_config")" "$(dirname "$target_daemon")"
   cp "$source_bin" "$target_bin"
   chmod 755 "$target_bin"
-  cp "$source_config" "$target_config"
-  chmod 600 "$target_config"
+  download_mihomo_config "$target_config"
   write_mihomo_daemon "$target_daemon"
+  write_mihomo_update_script "$target_updater"
+  install_mihomo_config_update_schedule "$target_updater"
   ln -sfn "$version" "$UENV_ROOT/opt/clash/current"
   ln -sfn "$UENV_ROOT/opt/clash/current/bin/mihomo" "$UENV_ROOT/bin/mihomo"
   warn_mihomo_config_risks "$target_config"
@@ -535,6 +650,12 @@ main() {
       ;;
     internal-print-mihomo-asset)
       echo "$(resolve_mihomo_asset)"
+      ;;
+    internal-normalize-mihomo-config)
+      normalize_mihomo_config "$2" "$3"
+      ;;
+    internal-render-mihomo-update-script)
+      render_mihomo_update_script
       ;;
     *)
       die "Unknown command: $command_name"

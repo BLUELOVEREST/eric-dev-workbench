@@ -63,6 +63,31 @@ test_dockerfile_has_ncurses_dev() {
   assert_contains "$output" "libncurses-dev"
 }
 
+test_mihomo_config_normalization_rewrites_ports() {
+  local tmp_dir
+  tmp_dir="$(mktemp -d)"
+  cat >"$tmp_dir/input.yaml" <<'EOF'
+port: 7890
+socks-port: 7891
+allow-lan: true
+EOF
+  bash "$ROOT_DIR/install.sh" internal-normalize-mihomo-config "$tmp_dir/input.yaml" "$tmp_dir/output.yaml"
+  local output
+  output="$(cat "$tmp_dir/output.yaml")"
+  assert_contains "$output" "port: 56666"
+  assert_contains "$output" "socks-port: 58888"
+  rm -rf "$tmp_dir"
+}
+
+test_mihomo_update_script_uses_remote_profile_url() {
+  local output
+  output="$(MIHOMO_PROFILE_URL="https://example.invalid/profile.yaml" bash "$ROOT_DIR/install.sh" internal-render-mihomo-update-script 2>&1)"
+  assert_contains "$output" "https://example.invalid/profile.yaml"
+  assert_contains "$output" 'HTTP_PORT="56666"'
+  assert_contains "$output" 'SOCKS_PORT="58888"'
+  assert_contains "$output" "command -v wget"
+}
+
 test_zsh_install_writes_theme_block() {
   local tmp_home
   tmp_home="$(mktemp -d)"
@@ -136,6 +161,8 @@ test_stdin_help_has_no_bash_source_error
 test_remote_mode_requires_git
 test_remote_bootstrap_has_no_workdir_trap_error
 test_dockerfile_has_ncurses_dev
+test_mihomo_config_normalization_rewrites_ports
+test_mihomo_update_script_uses_remote_profile_url
 test_zsh_install_writes_theme_block
 test_codex_install_adds_nvm_bootstrap
 test_zsh_block_is_idempotent

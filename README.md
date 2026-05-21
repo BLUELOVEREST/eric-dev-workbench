@@ -12,7 +12,6 @@ Single-entry installer for Eric's `zsh`, `mihomo`, and `codex` environment boots
 
 - `install.sh`: the only public installer entrypoint
 - `assets/mihomo/`: platform-specific mihomo binaries
-- `assets/config/mihomo-config.yaml`: default mihomo config
 - `assets/themes/p10k.zsh.template`: default powerlevel10k config template
 
 ## Quick Start
@@ -62,7 +61,11 @@ The remote bootstrap path clones the repository with `git` into a temporary dire
 - The installer is designed to be idempotent.
 - Shell configuration is managed through a single block in `~/.zshrc`.
 - For older Linux environments, the codex install defaults to Node `16.20.2`.
-- `mihomo` config security is not auto-modified; the installer only warns for risky settings.
+- `mihomo` config is downloaded from the configured remote profile URL during install.
+- The downloaded `mihomo` config is normalized to use HTTP port `56666` and SOCKS port `58888`, matching the generated shell proxy helpers.
+- If user `crontab` is available, the installer registers a non-root config refresh job every 6 hours.
+- If user `crontab` is unavailable, run `~/.uenv/bin/mihomo-update-config.sh` manually to refresh the proxy config.
+- `mihomo` config security is not auto-modified except for the local proxy ports; the installer only warns for risky settings.
 
 ## Docker Test Image
 
